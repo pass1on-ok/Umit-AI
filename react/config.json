@@ -1,0 +1,55 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "src": "src/pages/Home.tsx"
+    },
+    {
+      "path": "/auth",
+      "src": "src/pages/Auth.tsx"
+    },
+    {
+      "path": "/dashboard",
+      "src": "src/pages/PatientDashboard.tsx"
+    },
+    {
+      "path": "/profile",
+      "src": "src/pages/PatientProfile.tsx"
+    },
+    {
+      "path": "/test",
+      "src": "src/pages/TestInterface.tsx"
+    },
+    {
+      "path": "/test/results",
+      "src": "src/pages/TestResults.tsx"
+    },
+    {
+      "path": "/diary",
+      "src": "src/pages/SymptomDiary.tsx"
+    },
+    {
+      "path": "/chat",
+      "src": "src/pages/Chat.tsx"
+    },
+    {
+      "path": "/recommendations",
+      "src": "src/pages/Recommendations.tsx"
+    },
+    {
+      "path": "/doctor/dashboard",
+      "src": "src/pages/DoctorDashboard.tsx"
+    },
+    {
+      "path": "/doctor/analytics",
+      "src": "src/pages/PatientAnalytics.tsx"
+    },
+    {
+      "path": "/admin",
+      "src": "src/pages/AdminPanel.tsx"
+    }
+  ],
+  "components": [
+    {"name": "Layout", "src": "src/components/layout/Layout.tsx"}
+  ]
+}

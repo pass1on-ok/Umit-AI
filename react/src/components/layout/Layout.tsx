@@ -42,7 +42,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="bg-primary p-2 rounded-lg">
             <HeartPulse className="text-primary-foreground w-6 h-6" />
           </div>
-          <span className="text-xl font-bold tracking-tight">OncoSupport</span>
+          <span className="text-xl font-bold tracking-tight">UmitAI</span>
         </Link>
 
         {/* Role Switcher (Mock for preview navigation) */}

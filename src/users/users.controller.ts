@@ -1,26 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards,} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { NotFoundException } from '@nestjs/common'; 
+import { NotFoundException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-
+import { Role } from '@prisma/client';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
+  @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST, Role.PATIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
@@ -29,21 +36,23 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
-  const user = await this.usersService.findOne(id);
-  
-  if (!user) {
-    throw new NotFoundException(`User with ID ${id} not found`);
-  }
+    const user = await this.usersService.findOne(id);
 
-  return new UserEntity(user);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return new UserEntity(user);
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: UserEntity })
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto,) {
@@ -51,10 +60,27 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
+  }
+
+  @Patch(':id/profile') 
+  @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: UserEntity }) // Or ProfileEntity if you only want to return the profile
+  async updateProfile( @Param('id', ParseIntPipe) id: number, @Body() updateProfileDto: UpdateProfileDto){
+    const updatedUser = await this.usersService.updateProfile(id, updateProfileDto);
+
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+  
+    return new UserEntity(updatedUser);
   }
 }

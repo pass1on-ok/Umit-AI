@@ -28,5 +28,23 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   articles  Article[]
+  role Role @default(PATIENT)
+  profile   Profile?
+}
+
+model Profile {
+  id             Int      @id @default(autoincrement())
+  gender         String?
+  dateOfBirth    DateTime?
+  address        String?
+  userId         Int      @unique 
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+  PSYCHOLOGIST
+  ADMIN
 }
 

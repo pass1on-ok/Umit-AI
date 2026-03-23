@@ -17,7 +17,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Post()
-  @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST, Role.PATIENT)
+  @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: UserEntity })

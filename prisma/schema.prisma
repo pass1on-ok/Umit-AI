@@ -30,6 +30,7 @@ model User {
   articles  Article[]
   role Role @default(PATIENT)
   profile   Profile?
+  hadsResponses HadsResponse[]
 }
 
 model Profile {
@@ -39,6 +40,20 @@ model Profile {
   address        String?
   userId         Int      @unique 
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HadsResponse{
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime     @default(now())
+  
+  answers         Int[]    
+
+  anxietyScore    Int
+  depressionScore Int
+  
+
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Role {

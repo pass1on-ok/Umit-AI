@@ -16,75 +16,90 @@ async function main() {
 
   const passwordSabin = await bcrypt.hash('password-sabin', roundsOfHashing);
   const passwordAlex = await bcrypt.hash('password-alex', roundsOfHashing);
+  const passwordDrSmith = await bcrypt.hash('password-smith', roundsOfHashing);
+  const passwordJane = await bcrypt.hash('password-jane', roundsOfHashing);
 
   const user1 = await prisma.user.upsert({
     where: { email: 'sabin@adams.com' },
     update: {
-      password: passwordSabin, role: 'PATIENT', profile: { create: {}, },
-    },
+      password: passwordSabin, role: 'PATIENT' },
     create: {
       email: 'sabin@adams.com',
       name: 'Sabin Adams',
       password: passwordSabin,
       role: 'PATIENT',
+      profile: { create: {} },
+      symptoms: {
+      create: [
+        {
+          type: 'Anxiety',
+          severity: 6,
+          description: 'Increased heart rate.',
+        },
+        {
+          type: 'Insomnia',
+          severity: 4,
+          description: 'Difficulty staying asleep.',
+        }
+      ],
+      },
     },
   });
 
   const user2 = await prisma.user.upsert({
     where: { email: 'alex@ruheni.com' },
     update: {      
-      password: passwordAlex, role: 'ADMIN', profile: { create: {}, },
-    },
+      password: passwordAlex, role: 'ADMIN' },
     create: {
       email: 'alex@ruheni.com',
       name: 'Alex Ruheni',
       password: passwordAlex,
-      role: 'ADMIN'
+      role: 'ADMIN',
+      profile: { create: {} },
     },
   });
 
-
-  const post1 = await prisma.article.upsert({
-    where: { title: 'Prisma Adds Support for MongoDB' },
-    update: { authorId: user1.id,},
+const user3 = await prisma.user.upsert({
+    where: { email: 'dr.smith@hospital.com' },
+    update: { password: passwordDrSmith },
     create: {
-      title: 'Prisma Adds Support for MongoDB',
-      body: 'Support for MongoDB has been one of the most requested features since the initial release of...',
-      description:
-        "We are excited to share that today's Prisma ORM release adds stable support for MongoDB!",
-      published: false,
-      authorId: user1.id,
+      email: 'dr.smith@hospital.com',
+      name: 'Dr. Smith',
+      password: passwordDrSmith,
+      role: 'DOCTOR',
+      profile: { create: {} },
     },
   });
 
-  const post2 = await prisma.article.upsert({
-    where: { title: "What's new in Prisma? (Q1/22)" },
-    update: { authorId: user2.id,},
+  const user4 = await prisma.user.upsert({
+    where: { email: 'jane.doe@example.com' },
+    update: { password: passwordJane },
     create: {
-      title: "What's new in Prisma? (Q1/22)",
-      body: 'Our engineers have been working hard, issuing new releases with many improvements...',
-      description:
-        'Learn about everything in the Prisma ecosystem and community from January to March 2022.',
-      published: true,
-      authorId: user2.id,
-
+      email: 'jane.doe@example.com',
+      name: 'Jane Doe',
+      password: passwordJane,
+      role: 'PATIENT',
+      profile: { create: {} },
+      symptoms: {
+      create: [
+        {
+          type: 'Anxiety',
+          severity: 5,
+          description: 'Increased heart rate.',
+        },
+        {
+          type: 'Anxiety',
+          severity: 4,
+          description: 'Difficulty staying focused.',
+        }
+      ],
+      },
     },
   });
 
-   const post3 = await prisma.article.upsert({
-    where: { title: 'Prisma Client Just Became a Lot More Flexible' },
-    update: {},
-    create: {
-      title: 'Prisma Client Just Became a Lot More Flexible',
-      body: 'Prisma Client extensions provide a powerful new way to add functionality to Prisma in a type-safe manner...',
-      description:
-        'This article will explore various ways you can use Prisma Client extensions to add custom functionality to Prisma Client..',
-      published: true,
-    },
-  });
+ 
 
-
-    console.log({ user1, user2, post1, post2, post3 });
+    console.log({ user1, user2, user3, user4});
 }
 
 

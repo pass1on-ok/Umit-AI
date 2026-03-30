@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, ParseIntPipe, Request, ForbiddenException } from '@nestjs/common';
 import { HadsService } from './hads.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { NotFoundException } from '@nestjs/common';

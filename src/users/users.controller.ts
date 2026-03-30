@@ -11,6 +11,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Request } from '@nestjs/common';
+import { RegisterDto } from 'src/auth/dto/register.dto';
 
 @Controller('users')
 @ApiTags('users')
@@ -24,6 +25,12 @@ export class UsersController {
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
+  }
+
+  @Post('register')
+  @ApiCreatedResponse({type: UserEntity})
+  async register(@Body() registerDto: RegisterDto){
+    return new UserEntity(await this.usersService.register(registerDto))
   }
 
   @Get()

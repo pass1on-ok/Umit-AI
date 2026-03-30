@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException,UnauthorizedException, } from '@nestjs/common';
+import { Injectable, NotFoundException,UnauthorizedException, ConflictException } from '@nestjs/common';
 import { PrismaService } from './../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthEntity } from './entity/auth.entity';
 import * as bcrypt from 'bcrypt';
 
+export const roundsOfHashing = 10;
 
 @Injectable()
 export class AuthService {

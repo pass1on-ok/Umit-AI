@@ -4,6 +4,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { RegisterDto } from 'src/auth/dto/register.dto';
+import { ConflictException } from '@nestjs/common';
+import { Role } from '@prisma/client';
 
 export const roundsOfHashing = 10;
 
@@ -19,6 +22,23 @@ export class UsersService {
     createUserDto.password = hashedPassword;
 
     return this.prisma.user.create({ data: { ...createUserDto, profile: { create: {}, }, }, include: { profile: true } });
+  }
+
+  async register(registerDto: RegisterDto) {
+
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: registerDto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Email already in use');
+    }
+
+    const hashedPassword = await bcrypt.hash(registerDto.password, roundsOfHashing,);
+
+    registerDto.password = hashedPassword
+
+    return this.prisma.user.create({ data: { ...registerDto, role: Role.PATIENT, profile: { create: {}, }, }, include: { profile: true } });
   }
 
   findAll() {
@@ -43,10 +63,10 @@ export class UsersService {
   remove(id: number) {
     return this.prisma.user.delete({ where: { id } });
   }
-  
+
   async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
     if (updateProfileDto.dateOfBirth) {
-    updateProfileDto.dateOfBirth = new Date(updateProfileDto.dateOfBirth) as any;
+      updateProfileDto.dateOfBirth = new Date(updateProfileDto.dateOfBirth) as any;
     }
 
     const updatedProfile = await this.prisma.profile.update({

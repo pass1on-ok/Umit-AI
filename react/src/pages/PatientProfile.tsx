@@ -26,14 +26,20 @@ const PatientProfile = () => {
     role: 'patient',
   };
 
-  const isEmailValid = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+  const isEmailValid = (value: string) => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value.trim());
   const isPhoneValid = (value: string) => /^\+?[0-9\s\-()]{7,20}$/.test(value.trim());
+  const isFullNameValid = (value: string) => {
+    const words = value.trim().split(/\s+/);
+    return words.length >= 2 && words.every((word) => /^[\p{Lu}][\p{L}'-]*$/u.test(word));
+  };
 
   const validateProfile = (data: ProfilePayload): ValidationErrors => {
     const errors: ValidationErrors = {};
 
     if (!data.fullName.trim()) {
       errors.fullName = t('patientProfile.errors.fullName') ?? 'Full name is required';
+    } else if (!isFullNameValid(data.fullName)) {
+      errors.fullName = t('patientProfile.errors.fullNameInvalid') ?? 'Please enter a valid full name starting each word with uppercase';
     }
 
     if (!data.dateOfBirth) {
@@ -43,7 +49,7 @@ const PatientProfile = () => {
     if (!data.email.trim()) {
       errors.email = t('patientProfile.errors.email') ?? 'Email is required';
     } else if (!isEmailValid(data.email)) {
-      errors.email = t('patientProfile.errors.emailInvalid') ?? 'Enter a valid email address';
+      errors.email = t('patientProfile.errors.emailInvalid') ?? 'Enter a valid Latin email address';
     }
 
     if (!data.phone.trim()) {
@@ -69,11 +75,14 @@ const PatientProfile = () => {
 
   const [profile, setProfile] = useState<ProfilePayload & { id: string; role: string }>(defaultProfile);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(() => validateProfile(defaultProfile));
+  const [touchedFields, setTouchedFields] = useState<Partial<Record<keyof ProfilePayload, boolean>>>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isFormValid = Object.keys(validationErrors).length === 0;
+  const shouldShowError = (field: keyof ProfilePayload) => Boolean(validationErrors[field] && (submitAttempted || touchedFields[field]));
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -99,10 +108,12 @@ const PatientProfile = () => {
 
   const handleChange = (key: keyof ProfilePayload, value: string) => {
     setProfile((prev) => ({ ...prev, [key]: value }));
+    setTouchedFields((prev) => ({ ...prev, [key]: true }));
   };
 
   const handleSave = async () => {
     setError(null);
+    setSubmitAttempted(true);
     const currentErrors = validateProfile(profile);
     setValidationErrors(currentErrors);
 
@@ -155,9 +166,9 @@ const PatientProfile = () => {
               <Input
                 value={profile.fullName}
                 onChange={(e) => handleChange('fullName', e.target.value)}
-                className={validationErrors.fullName ? 'border-destructive focus-visible:ring-destructive/50' : ''}
+                className={shouldShowError('fullName') ? 'border-destructive focus-visible:ring-destructive/50' : ''}
               />
-              {validationErrors.fullName ? <p className="text-xs text-destructive">{validationErrors.fullName}</p> : null}
+              {shouldShowError('fullName') ? <p className="text-xs text-destructive">{validationErrors.fullName}</p> : null}
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-foreground">{t('patientProfile.dateOfBirth')}</label>
@@ -165,9 +176,9 @@ const PatientProfile = () => {
                 type="date"
                 value={profile.dateOfBirth}
                 onChange={(e) => handleChange('dateOfBirth', e.target.value)}
-                className={validationErrors.dateOfBirth ? 'border-destructive focus-visible:ring-destructive/50' : ''}
+                className={shouldShowError('dateOfBirth') ? 'border-destructive focus-visible:ring-destructive/50' : ''}
               />
-              {validationErrors.dateOfBirth ? <p className="text-xs text-destructive">{validationErrors.dateOfBirth}</p> : null}
+              {shouldShowError('dateOfBirth') ? <p className="text-xs text-destructive">{validationErrors.dateOfBirth}</p> : null}
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-foreground">{t('patientProfile.contactEmail')}</label>
@@ -175,9 +186,9 @@ const PatientProfile = () => {
                 type="email"
                 value={profile.email}
                 onChange={(e) => handleChange('email', e.target.value)}
-                className={validationErrors.email ? 'border-destructive focus-visible:ring-destructive/50' : ''}
+                className={shouldShowError('email') ? 'border-destructive focus-visible:ring-destructive/50' : ''}
               />
-              {validationErrors.email ? <p className="text-xs text-destructive">{validationErrors.email}</p> : null}
+              {shouldShowError('email') ? <p className="text-xs text-destructive">{validationErrors.email}</p> : null}
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-foreground">{t('patientProfile.phoneNumber')}</label>
@@ -185,9 +196,9 @@ const PatientProfile = () => {
                 type="tel"
                 value={profile.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
-                className={validationErrors.phone ? 'border-destructive focus-visible:ring-destructive/50' : ''}
+                className={shouldShowError('phone') ? 'border-destructive focus-visible:ring-destructive/50' : ''}
               />
-              {validationErrors.phone ? <p className="text-xs text-destructive">{validationErrors.phone}</p> : null}
+              {shouldShowError('phone') ? <p className="text-xs text-destructive">{validationErrors.phone}</p> : null}
             </div>
           </CardContent>
         </Card>
@@ -202,7 +213,7 @@ const PatientProfile = () => {
               <select
                 value={profile.diagnosis}
                 onChange={(e) => handleChange('diagnosis', e.target.value)}
-                className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground ${validationErrors.diagnosis ? 'border-destructive' : 'border-input'}`}
+                className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground ${shouldShowError('diagnosis') ? 'border-destructive' : 'border-input'}`}
               >
                 <option value="">{t('patientProfile.selectDiagnosis') ?? 'Select diagnosis'}</option>
                 <option value="breast_cancer">{t('patientProfile.breastCancer')}</option>
@@ -217,7 +228,7 @@ const PatientProfile = () => {
               <select
                 value={profile.stage}
                 onChange={(e) => handleChange('stage', e.target.value)}
-                className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground ${validationErrors.stage ? 'border-destructive' : 'border-input'}`}
+                className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground ${shouldShowError('stage') ? 'border-destructive' : 'border-input'}`}
               >
                 <option value="">{t('patientProfile.selectStage') ?? 'Select stage'}</option>
                 <option value="1">{t('patientProfile.stage1')}</option>
@@ -232,7 +243,7 @@ const PatientProfile = () => {
               <select
                 value={profile.treatmentPhase}
                 onChange={(e) => handleChange('treatmentPhase', e.target.value)}
-                className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground ${validationErrors.treatmentPhase ? 'border-destructive' : 'border-input'}`}
+                className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground ${shouldShowError('treatmentPhase') ? 'border-destructive' : 'border-input'}`}
               >
                 <option value="">{t('patientProfile.selectTreatmentPhase') ?? 'Select treatment phase'}</option>
                 <option value="pre">{t('patientProfile.preTreatment')}</option>

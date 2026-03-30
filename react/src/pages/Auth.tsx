@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { LogIn, UserPlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
 
@@ -19,9 +21,9 @@ const Auth = () => {
     <div className="flex items-center justify-center min-h-[80vh]">
       <Card className="w-full max-w-md shadow-custom border-border bg-card">
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-2xl font-bold">{isLogin ? 'Welcome Back' : 'Create an Account'}</CardTitle>
+          <CardTitle className="text-2xl font-bold">{isLogin ? t('auth.welcomeBack') : t('auth.createAccount')}</CardTitle>
           <p className="text-sm text-muted-foreground mt-2">
-            {isLogin ? 'Enter your details to access your portal' : 'Register to start your supported journey'}
+            {isLogin ? t('auth.enterDetails') : t('auth.registerStart')}
           </p>
         </CardHeader>
         <CardContent>
@@ -30,38 +32,38 @@ const Auth = () => {
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-2 text-sm rounded font-medium transition-all ${isLogin ? 'bg-background shadow-custom text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Sign In
+              {t('auth.signIn')}
             </button>
             <button 
               onClick={() => setIsLogin(false)}
               className={`flex-1 py-2 text-sm rounded font-medium transition-all ${!isLogin ? 'bg-background shadow-custom text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Register
+              {t('auth.register')}
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {!isLogin && (
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium">Full Name</label>
-                <Input placeholder="John Doe" required />
+                <label className="text-sm font-medium">{t('auth.fullName')}</label>
+                <Input placeholder={t('auth.fullName')} required />
               </div>
             )}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium">Email Address</label>
-              <Input type="email" placeholder="patient@example.com" required />
+              <label className="text-sm font-medium">{t('auth.emailAddress')}</label>
+              <Input type="email" placeholder={t('auth.emailAddress')} required />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium">Password</label>
-              <Input type="password" placeholder="••••••••" required />
+              <label className="text-sm font-medium">{t('auth.password')}</label>
+              <Input type="password" placeholder={t('auth.password')} required />
             </div>
             <Button type="submit" className="w-full mt-4 h-12 text-lg">
-              {isLogin ? <><LogIn className="w-5 h-5 mr-2" /> Log In</> : <><UserPlus className="w-5 h-5 mr-2" /> Register</>}
+              {isLogin ? <><LogIn className="w-5 h-5 mr-2" /> {t('auth.logIn')}</> : <><UserPlus className="w-5 h-5 mr-2" /> {t('auth.register')}</>}
             </Button>
           </form>
           
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            For medical emergencies, please call emergency services immediately.
+            {t('auth.forEmergencies')}
           </div>
         </CardContent>
       </Card>

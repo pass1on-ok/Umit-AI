@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { Table, Button, Badge, Select } from '@/shared/ui'; // Предполагаем наличие UI-кита
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);

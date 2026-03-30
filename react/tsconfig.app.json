@@ -17,6 +17,8 @@
     "emitDeclarationOnly": true,
     "noEmit": false,
     "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
 
     /* Linting */
     "strict": false,

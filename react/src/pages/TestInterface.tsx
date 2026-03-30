@@ -3,12 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, HelpCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import LoadingSpinner from "@/components/ui/loading-spinner";
 
 const TestInterface = () => {
   const navigate = useNavigate();
   const [currentAnswers, setCurrentAnswers] = useState<Record<number, number>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const questions = [
     { id: 1, type: 'A', text: "I feel tense or 'wound up':", options: ["Most of the time (3)", "A lot of the time (2)", "From time to time, occasionally (1)", "Not at all (0)"] },
@@ -22,11 +20,8 @@ const TestInterface = () => {
   };
 
   const handleSubmit = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      navigate('/test/results');
-    }, 1000);
+    console.log("Submitting test results: ", currentAnswers);
+    navigate('/test/results');
   };
 
   return (
@@ -74,16 +69,10 @@ const TestInterface = () => {
         <Button 
           size="lg" 
           onClick={handleSubmit} 
-          disabled={Object.keys(currentAnswers).length < questions.length || isSubmitting}
+          disabled={Object.keys(currentAnswers).length < questions.length}
           className="gap-2 px-8"
         >
-          {isSubmitting ? (
-            <>
-              <LoadingSpinner size={18} className="mr-2" /> Submitting...
-            </>
-          ) : (
-            <>Submit Results <ArrowRight className="w-5 h-5" /></>
-          )}
+          Submit Results <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
     </div>

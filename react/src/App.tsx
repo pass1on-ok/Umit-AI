@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
-import ErrorBoundary from "./components/ui/error-boundary";
 
 // Page Imports
 import Home from "./pages/Home";
@@ -22,27 +21,22 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
-      <ErrorBoundary>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<PatientDashboard />} />
-            <Route path="/profile" element={<PatientProfile />} />
-            <Route path="/test" element={<TestInterface />} />
-            <Route path="/test/results" element={<TestResults />} />
-            <Route path="/diary" element={<SymptomDiary />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/recommendations" element={<Recommendations />} />
-            <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-            <Route path="/doctor/analytics" element={<PatientAnalytics />} />
-            <Route path="/doctor/analytics/:patientId" element={<PatientAnalytics />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/chat/:patientId" element={<Chat />} />
-            <Route path="/admin" element={<AdminPanel />} />
-          </Routes>
-        </Layout>
-      </ErrorBoundary>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={<PatientDashboard />} />
+          <Route path="/profile" element={<PatientProfile />} />
+          <Route path="/test" element={<TestInterface />} />
+          <Route path="/test/results" element={<TestResults />} />
+          <Route path="/diary" element={<SymptomDiary />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/recommendations" element={<Recommendations />} />
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <Route path="/doctor/analytics" element={<PatientAnalytics />} />
+          <Route path="/admin" element={<AdminPanel />} />
+        </Routes>
+      </Layout>
     </BrowserRouter>
   </QueryClientProvider>
 );

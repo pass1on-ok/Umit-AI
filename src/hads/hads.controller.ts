@@ -13,7 +13,7 @@ import { HadsEntity } from './entities/hads.entity';
 @Controller('hads')
 @ApiTags('hads')
 export class HadsController {
-  constructor(private readonly hadsService: HadsService) {}
+  constructor(private readonly hadsService: HadsService) { }
 
   @Post()
   @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST, Role.PATIENT)
@@ -34,17 +34,23 @@ export class HadsController {
     return hads.map((hads) => new HadsEntity(hads));
   }
 
-   @Get(':id')
-   @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST, Role.PATIENT)
-   @UseGuards(JwtAuthGuard, RolesGuard)
-   @ApiBearerAuth()
-   @ApiOkResponse({ type: HadsEntity })
-   async findOne(@Param('id', ParseIntPipe) id: number) {
-     const hads = await this.hadsService.findOne(id);
-     if (!hads) {
-       throw new NotFoundException(`HADS with ${id} does not exist.`);
-     }
-     return new HadsEntity(hads);
-   }
- 
+  @Get('my-results')
+  @UseGuards(JwtAuthGuard) 
+  @ApiBearerAuth()
+  async findAllMyResults(@Request() req) {
+    return this.hadsService.findAllForUser(req.user.id);
+  }
+  
+  @Get(':id')
+  @Roles(Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST, Role.PATIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: HadsEntity })
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const hads = await this.hadsService.findOne(id);
+    if (!hads) {
+      throw new NotFoundException(`HADS with ${id} does not exist.`);
+    }
+    return new HadsEntity(hads);
+  }
 }

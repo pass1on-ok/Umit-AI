@@ -23,7 +23,7 @@ export class UserEntity implements User {
   updatedAt: Date;
 
   @ApiProperty()
-  name: string | null;
+  name: string;
 
   @ApiProperty()
   email: string;

@@ -38,4 +38,7 @@ export class HadsService {
     return this.prisma.hadsResponse.findUnique({ where: { id } });
   }
 
+  async findAllForUser(userId: number) {
+  return this.prisma.hadsResponse.findMany({   where: { userId }, orderBy: { createdAt: 'asc' }, });
+  }
 }

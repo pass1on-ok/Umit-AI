@@ -65,13 +65,15 @@ export class UsersService {
   }
 
   async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+    const dataToUpdate: any = { ...updateProfileDto };
+
     if (updateProfileDto.dateOfBirth) {
-      updateProfileDto.dateOfBirth = new Date(updateProfileDto.dateOfBirth) as any;
+      dataToUpdate.dateOfBirth = new Date(updateProfileDto.dateOfBirth);
     }
 
     const updatedProfile = await this.prisma.profile.update({
       where: { userId },
-      data: updateProfileDto,
+      data: dataToUpdate,
     });
 
     return this.findOne(userId);

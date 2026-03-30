@@ -8,7 +8,7 @@ export class CreateHadsDto {
     @ArrayMaxSize(14)
     @IsInt({each: true})
     @Min(0, {each: true})
-    @Max(0, {each: true})
+    @Max(3, {each: true})
     answers: number[];
 
 }

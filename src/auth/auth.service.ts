@@ -31,7 +31,12 @@ constructor(private prisma: PrismaService, private jwtService: JwtService) {}
    
     return {
       accessToken: this.jwtService.sign({ userId: user.id }),
-
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role, 
+    }
     }
    }
 }

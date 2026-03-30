@@ -8,6 +8,7 @@
     "adminPanel": "Admin Panel",
     "analytics": "Analytics",
     "signIn": "Sign In",
+    "logout": "Logout",
     "viewProfile": "View Profile",
     "patientChat": "Patient Chat",
     "searchMessages": "Search messages...",
@@ -17,15 +18,18 @@
   "home": {
     "headline": "Compassionate Care,",
     "headlineHighlight": "Powered by Data",
-    "subtext": "OncoSupport bridges the gap between clinic visits with daily symptom tracking, verified psychological assessments, and direct communication with your healthcare team.",
+    "subtext": "UmitAI bridges the gap between clinic visits with daily symptom tracking, verified psychological assessments, and direct communication with your healthcare team.",
     "getStarted": "Get Started",
+    "goToDashboard": "Go to Dashboard →",
     "viewDemo": "View Live Demo",
     "continuousTracking": "Continuous Tracking",
     "continuousTrackingDescription": "Log your daily symptoms like pain and fatigue to help your doctors understand your wellness journey.",
     "psychologicalSupport": "Psychological Support",
     "psychologicalSupportDescription": "Take clinical HADS tests and receive immediate recommendations to support your mental health.",
     "secureCommunication": "Secure Communication",
-    "secureCommunicationDescription": "Chat securely with your assigned psychologist and medical team when you need them most."
+    "secureCommunicationDescription": "Chat securely with your assigned psychologist and medical team when you need them most.",
+    "demoTitle": "Preview demo",
+    "demoDescription": "Choose a role to view the dashboard without changing your real login state."
   },
   "auth": {
     "welcomeBack": "Welcome Back",

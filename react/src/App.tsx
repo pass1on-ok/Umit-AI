@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
+import { AuthProvider } from "./context/AuthContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Page Imports
 import Home from "./pages/Home";
@@ -20,9 +22,11 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <Layout>
-        <Routes>
+    <AuthProvider>
+      <BrowserRouter>
+        <ErrorBoundary>
+          <Layout>
+            <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<PatientDashboard />} />
@@ -37,7 +41,9 @@ const App = () => (
           <Route path="/admin" element={<AdminPanel />} />
         </Routes>
       </Layout>
-    </BrowserRouter>
+    </ErrorBoundary>
+  </BrowserRouter>
+</AuthProvider>
   </QueryClientProvider>
 );
 

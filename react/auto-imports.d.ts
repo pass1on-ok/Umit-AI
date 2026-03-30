@@ -48,6 +48,7 @@ declare global {
   const Lightbulb: typeof import('lucide-react').Lightbulb
   const LineChart: typeof import('lucide-react').LineChart
   const Link: typeof import('lucide-react').Link
+  const Loader2: typeof import('lucide-react').Loader2
   const Loader2Icon: typeof import('lucide-react').Loader2Icon
   const LogIn: typeof import('lucide-react').LogIn
   const LogOut: typeof import('lucide-react').LogOut
@@ -83,6 +84,7 @@ declare global {
   const Utensils: typeof import('lucide-react').Utensils
   const Video: typeof import('lucide-react').Video
   const View: typeof import('lucide-react').View
+  const X: typeof import('lucide-react').X
   const XIcon: typeof import('lucide-react').XIcon
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal

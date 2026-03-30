@@ -1,16 +1,42 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { HeartPulse, User, Menu, LogOut, LayoutDashboard, FileText, Activity, MessageCircle, Settings, Shield } from 'lucide-react';
+import { HeartPulse, User, Menu, LogIn, LogOut, LayoutDashboard, FileText, Activity, MessageCircle, Settings, Shield } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useAuth } from '@/context/AuthContext';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const path = location.pathname;
+  const searchParams = new URLSearchParams(location.search);
+  const demoMode = searchParams.get('demo') === '1';
   const { t, i18n } = useTranslation();
-  const activeLang = i18n.resolvedLanguage || 'en';
+  const { user, signOut } = useAuth();
 
-  console.log("Current path details:", path);
+  const languageOptions = [
+    { code: 'en', label: 'Eng' },
+    { code: 'kk', label: 'Қаз' },
+    { code: 'ru', label: 'Ру' },
+  ];
+
+  const currentLanguage = i18n.language?.substring(0, 2) || 'en';
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
+  const handleLogout = async () => {
+    if (demoMode && !user) {
+      navigate('/');
+      return;
+    }
+
+    await signOut();
+    navigate('/');
+  };
+
+  const getDemoLink = (targetPath: string) => demoMode ? `${targetPath}?demo=1` : targetPath;
 
   const getRoleNav = () => {
     if (path.startsWith('/admin')) {
@@ -41,59 +67,41 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen bg-background text-foreground font-sans flex flex-col items-center">
       {/* Top Header - Fixed at max 1440px */}
       <header className="w-full max-w-[1440px] px-6 py-4 flex items-center justify-between border-b border-border bg-card shadow-custom sticky top-0 z-50">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to={getDemoLink('/')} className="flex items-center gap-2">
           <div className="bg-primary p-2 rounded-lg">
             <HeartPulse className="text-primary-foreground w-6 h-6" />
           </div>
           <span className="text-xl font-bold tracking-tight">{t('brand')}</span>
         </Link>
 
-        {/* Role Switcher (Mock for preview navigation) */}
-        <div className="hidden md:flex items-center gap-4">
-          <div className="hidden md:flex bg-muted p-1 rounded-md border border-border">
-            <Link to="/dashboard" className={`px-3 py-1 text-sm rounded ${!path.includes('doctor') && !path.includes('admin') && path !== '/' && path !== '/auth' ? 'bg-background shadow-custom' : 'text-muted-foreground hover:text-foreground'}`}>
-              {t('layout.patient')}
-            </Link>
-            <Link to="/doctor/dashboard" className={`px-3 py-1 text-sm rounded ${path.includes('doctor') ? 'bg-background shadow-custom' : 'text-muted-foreground hover:text-foreground'}`}>
-              {t('layout.doctor')}
-            </Link>
-            <Link to="/admin" className={`px-3 py-1 text-sm rounded ${path.includes('admin') ? 'bg-background shadow-custom' : 'text-muted-foreground hover:text-foreground'}`}>
-              {t('layout.admin')}
-            </Link>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {languageOptions.map((lang) => (
+              <Button
+                key={lang.code}
+                variant={currentLanguage === lang.code ? 'secondary' : 'ghost'}
+                size="sm"
+                className="min-w-[48px] px-2"
+                onClick={() => changeLanguage(lang.code)}
+              >
+                {lang.label}
+              </Button>
+            ))}
           </div>
-          <div className="flex items-center gap-1 rounded-md border border-border bg-muted px-1">
-            <button
-              type="button"
-              onClick={() => i18n.changeLanguage('en')}
-              className={`px-3 py-1 text-sm rounded ${activeLang === 'en' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Eng
-            </button>
-            <span className="text-muted-foreground">|</span>
-            <button
-              type="button"
-              onClick={() => i18n.changeLanguage('kk')}
-              className={`px-3 py-1 text-sm rounded ${activeLang === 'kk' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Қаз
-            </button>
-            <span className="text-muted-foreground">|</span>
-            <button
-              type="button"
-              onClick={() => i18n.changeLanguage('ru')}
-              className={`px-3 py-1 text-sm rounded ${activeLang === 'ru' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Ру
-            </button>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <Link to="/auth">
-            <Button variant="outline" size="sm" className="hidden md:flex gap-2">
-              <LogOut className="w-4 h-4" /> {t('layout.signIn')}
-            </Button>
-          </Link>
+          {(path === '/' || demoMode) && (
+            user || demoMode ? (
+              <Button variant="outline" size="sm" className="gap-2" onClick={handleLogout}>
+                <LogOut className="w-4 h-4" /> {t('layout.logout')}
+              </Button>
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <LogIn className="w-4 h-4" /> {t('layout.signIn')}
+                </Button>
+              </Link>
+            )
+          )}
           <button className="md:hidden p-2">
             <Menu className="w-6 h-6 border rounded border-border" />
           </button>
@@ -111,7 +119,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               return (
                 <Link
                   key={item.path}
-                  to={item.path}
+                  to={getDemoLink(item.path)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
                     isActive 
                       ? 'bg-primary/10 text-primary font-medium border border-primary/20' 
@@ -123,6 +131,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </Link>
               );
             })}
+
+            {user && (
+              <div className="mt-auto pt-4 border-t border-border">
+                <Button variant="outline" size="sm" className="w-full gap-2" onClick={handleLogout}>
+                  <LogOut className="w-4 h-4" /> {t('layout.logout')}
+                </Button>
+              </div>
+            )}
           </aside>
         )}
         

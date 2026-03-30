@@ -22,8 +22,8 @@ const DoctorDashboard = () => {
           <p className="text-muted-foreground mt-1">{t('doctorDashboard.subtitle')}</p>
         </div>
         <div className="flex bg-card border border-border rounded-lg p-1">
-          <div className="px-4 py-2 text-sm font-medium text-destructive bg-destructive/10 rounded flex items-center gap-2"><AlertCircle className="w-4 h-4"/> 1 Critical Alert</div>
-          <div className="px-4 py-2 text-sm font-medium text-amber-500 rounded flex items-center gap-2">1 Warning</div>
+          <div className="px-4 py-2 text-sm font-medium text-destructive bg-destructive/10 rounded flex items-center gap-2"><AlertCircle className="w-4 h-4"/> {t('doctorDashboard.criticalAlert')}</div>
+          <div className="px-4 py-2 text-sm font-medium text-amber-500 rounded flex items-center gap-2">{t('doctorDashboard.warning')}</div>
         </div>
       </div>
 

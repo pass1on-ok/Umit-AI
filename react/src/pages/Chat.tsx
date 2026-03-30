@@ -57,6 +57,23 @@ const Chat = () => {
   const activeConversation = conversations.find((conversation) => conversation.id === activeConversationId) ?? conversations[0];
   const currentPatientId = activeConversation?.patientId ?? patientId;
 
+  const statusLabel = status === 'connected'
+    ? t('chat.online')
+    : status === 'disconnected'
+      ? t('chat.offline')
+      : t('chat.connecting');
+
+  const filteredConversations = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) {
+      return conversations;
+    }
+    return conversations.filter((conversation) =>
+      conversation.title.toLowerCase().includes(query) ||
+      conversation.subtitle.toLowerCase().includes(query)
+    );
+  }, [conversations, searchQuery]);
+
   const filteredMessages = useMemo(
     () => {
       const query = searchQuery.trim().toLowerCase();
@@ -160,7 +177,7 @@ const Chat = () => {
     <div className="w-full max-w-6xl mx-auto h-[80vh] flex flex-col gap-4 px-4">
       {error ? <ErrorMessage message={error} onDismiss={() => setError(null)} /> : null}
       {isLoading ? (
-        <LoadingSpinner text="Loading chat history..." variant="page" />
+        <LoadingSpinner text={t('chat.loadingHistory') ?? 'Loading chat history...'} variant="page" />
       ) : (
         <Card className="flex-1 flex md:flex-row overflow-hidden shadow-custom border-border bg-card border">
           <div className="w-80 border-r border-border bg-muted/30 flex flex-col hidden md:flex">
@@ -177,17 +194,17 @@ const Chat = () => {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {conversations.map((conversation) => {
+              {filteredConversations.map((conversation) => {
                 const isActive = conversation.id === activeConversationId;
                 return (
                   <div
                     key={conversation.id}
                     onClick={() => handleConversationClick(conversation.id)}
-                    className={`p-4 border-b border-border cursor-pointer flex gap-3 items-center transition ${isActive ? 'bg-primary/10 border-primary' : 'hover:bg-muted'}`}
+                    className={`p-4 border-b border-border cursor-pointer flex gap-3 items-center transition min-w-0 ${isActive ? 'bg-primary/10 border-primary' : 'hover:bg-muted'}`}
                   >
                     <UserCircle className={`w-10 h-10 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold text-sm text-foreground">{conversation.title}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-sm text-foreground truncate">{conversation.title}</p>
                       <p className="text-xs text-muted-foreground truncate">{conversation.subtitle}</p>
                     </div>
                   </div>
@@ -203,13 +220,13 @@ const Chat = () => {
                 <div>
                   <p className="font-bold text-foreground">{t('chat.drEmily')}</p>
                   <p className={`text-xs ${status === 'connected' ? 'text-green-500' : 'text-destructive'}`}>
-                    {status === 'connected' ? 'Online' : 'Offline'}
+                    {statusLabel}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">{status}</span>
-                {isOtherTyping ? <span className="text-xs text-muted-foreground">Typing...</span> : null}
+                <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">{statusLabel}</span>
+                {isOtherTyping ? <span className="text-xs text-muted-foreground">{t('chat.typing')}</span> : null}
                 <Button variant="ghost" size="sm" className="hidden lg:flex"><Info className="w-4 h-4 mr-2" /> {t('chat.viewProfile')}</Button>
               </div>
             </div>
@@ -224,7 +241,7 @@ const Chat = () => {
                   </div>
                 ))
               ) : (
-                <div className="text-center text-sm text-muted-foreground py-8">{t('chat.noMessagesFound') ?? 'No messages found.'}</div>
+                <div className="text-center text-sm text-muted-foreground py-8">{t('chat.noMessagesFound')}</div>
               )}
             </div>
 

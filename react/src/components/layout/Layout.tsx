@@ -18,7 +18,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     if (path.startsWith('/doctor')) {
       return [
         { name: 'Dr. Dashboard', path: '/doctor/dashboard', icon: LayoutDashboard },
-        { name: 'Analytics', path: '/doctor/analytics', icon: Activity }
+        { name: 'Analytics', path: '/doctor/analytics', icon: Activity },
+        { name: 'Chat', path: '/chat', icon: MessageCircle }
       ];
     }
     // Default to Patient Nav
@@ -71,7 +72,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider">Navigation</div>
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = path === item.path;
+              const isActive = path === item.path || path.startsWith(`${item.path}/`);
               return (
                 <Link
                   key={item.path}

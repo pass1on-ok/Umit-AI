@@ -18,15 +18,10 @@ const Home = () => {
         OncoSupport bridges the gap between clinic visits with daily symptom tracking, verified psychological assessments, and direct communication with your healthcare team.
       </p>
       
-      <div className="flex gap-4 mb-16">
+      <div className="flex gap-4 mb-16 justify-center">
         <Link to="/auth">
           <Button size="lg" className="gap-2 px-8 text-lg h-14">
             Get Started <ArrowRight className="w-5 h-5" />
-          </Button>
-        </Link>
-        <Link to="/dashboard">
-          <Button size="lg" variant="outline" className="gap-2 px-8 text-lg h-14">
-            View Live Demo
           </Button>
         </Link>
       </div>

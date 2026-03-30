@@ -4,15 +4,20 @@ import { LogIn, UserPlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Auth format submitted, navigating to dashboard");
-    navigate('/dashboard');
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      navigate('/dashboard');
+    }, 1000);
   };
 
   return (
@@ -55,8 +60,17 @@ const Auth = () => {
               <label className="text-sm font-medium">Password</label>
               <Input type="password" placeholder="••••••••" required />
             </div>
-            <Button type="submit" className="w-full mt-4 h-12 text-lg">
-              {isLogin ? <><LogIn className="w-5 h-5 mr-2" /> Log In</> : <><UserPlus className="w-5 h-5 mr-2" /> Register</>}
+            <Button type="submit" disabled={isLoading} className="w-full mt-4 h-12 text-lg">
+              {isLoading ? (
+                <>
+                  <LoadingSpinner size={18} className="mr-2" />
+                  {isLogin ? 'Signing in...' : 'Registering...'}
+                </>
+              ) : isLogin ? (
+                <><LogIn className="w-5 h-5 mr-2" /> Log In</>
+              ) : (
+                <><UserPlus className="w-5 h-5 mr-2" /> Register</>
+              )}
             </Button>
           </form>
           

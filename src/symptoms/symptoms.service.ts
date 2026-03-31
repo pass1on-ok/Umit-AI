@@ -11,52 +11,96 @@ export class SymptomsService {
 
 
   create(createSymptomDto: CreateSymptomDto, userId: number) {
-    return this.prisma.symptom.create({ data: { ...createSymptomDto, userId: userId } });
+    return this.prisma.symptom.create({
+    data: {
+      userId: userId,
+      description: createSymptomDto.description,
+      values: {
+        create: createSymptomDto.values, 
+      },
+    },
+    include: {
+      values: true, 
+    },
+  });
+}
+
+findAll(user: any) {
+  const isStaff = [Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST].includes(user.role);
+
+  return this.prisma.symptom.findMany({
+    where: isStaff ? {} : { userId: user.id },
+    include: {
+      values: true,
+    },    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+}
+
+async findOne(id: number, user: any) {
+  const entry = await this.prisma.symptom.findUnique({
+    where: { id },
+    include: { values: true },
+  });
+
+  if (!entry) {
+    throw new NotFoundException(`Symptom record ${id} not found`);
   }
 
-  findAll(user: any) {
-    const isStaff = [Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST].includes(user.role);
-    return this.prisma.symptom.findMany({ where: isStaff ? {} : { userId: user.id }, })
+  const isStaff = [Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST].includes(user.role);
+    if (!isStaff && entry.userId !== user.id) {
+    throw new ForbiddenException('You do not have access to this symptom record');
   }
 
-  async findOne(id: number, user: any) {
-    const symptom = await this.prisma.symptom.findUnique({ where: { id } });
-    if (!symptom) throw new NotFoundException(`Symptom ${id} not found`);
+  return entry;
+}
 
-    const isStaff = [Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST].includes(user.role);
-    if (!isStaff && symptom.userId !== user.id) {
-      throw new ForbiddenException('You do not have access to this symptom record');
-    }
-    return symptom;
+async update(id: number, updateSymptomDto: UpdateSymptomDto, user: any) {
+  const entry = await this.prisma.symptom.findUnique({ 
+    where: { id },
+    include: { values: true } 
+  });
+
+  if (!entry) throw new NotFoundException(`Symptom entry ${id} not found`);
+
+  const canEdit = user.role === 'ADMIN' || user.role === 'DOCTOR' || entry.userId === user.id;
+  if (!canEdit) throw new ForbiddenException('Access Denied');
+
+  return this.prisma.symptom.update({
+    where: { id },
+    data: {
+      description: updateSymptomDto.description,
+      values: {
+        deleteMany: {}, 
+        create: updateSymptomDto.values?.map(v => ({
+          type: v.type,
+          severity: v.severity
+        }))
+      }
+    },
+    include: { values: true }
+  });
+}
+
+async remove(id: number, user: any) {
+  const entry = await this.prisma.symptom.findUnique({ 
+    where: { id } 
+  });
+
+  if (!entry) {
+    throw new NotFoundException(`Symptom record ${id} not found`);
   }
 
-  async update(id: number, updateSymptomDto: UpdateSymptomDto, user: any) {
-    const symptom = await this.prisma.symptom.findUnique({ where: { id } });
+  const isStaff = [Role.ADMIN, Role.DOCTOR, Role.PSYCHOLOGIST].includes(user.role);
+  const isOwner = entry.userId === user.id;
 
-    if (!symptom) throw new NotFoundException(`Symptom ${id} not found`);
-
-    const canEdit = user.role === Role.ADMIN || user.role === Role.DOCTOR || symptom.userId === user.id;
-
-    if (!canEdit) {
-      throw new ForbiddenException('Access Denied');
-    }
-    return this.prisma.symptom.update({
-      where: { id },
-      data: updateSymptomDto,
-    });
+  if (!isStaff && !isOwner) {
+    throw new ForbiddenException('You do not have permission to delete this record');
   }
 
-  async remove(id: number, user: any) {
-     const symptom = await this.prisma.symptom.findUnique({ where: { id } });
-
-    if (!symptom) throw new NotFoundException(`Symptom ${id} not found`);
-
-    const canDelete = user.role === Role.ADMIN || user.role === Role.DOCTOR || symptom.userId === user.id;
-
-    if (!canDelete) {
-      throw new ForbiddenException('Access Denied');
-    }
-
-    return this.prisma.symptom.delete({ where: { id } });
+  return this.prisma.symptom.delete({ 
+    where: { id } 
+  });
   }
 }

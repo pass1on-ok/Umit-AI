@@ -1,15 +1,17 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg';
-
+import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcrypt';
 
-// const adapter = new PrismaPg({
-//   connectionString: process.env.DATABASE_URL!,
-// });
+dotenv.config();
 
-// const prisma = new PrismaClient({ adapter });
+console.log('Database URL check:', process.env.DATABASE_URL);
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+
+const prisma = new PrismaClient({ adapter });
 
 const roundsOfHashing = 10;
 
@@ -24,7 +26,8 @@ async function main() {
   const user1 = await prisma.user.upsert({
     where: { email: 'sabin@adams.com' },
     update: {
-      password: passwordSabin, role: 'PATIENT' },
+      password: passwordSabin, role: 'PATIENT'
+    },
     create: {
       email: 'sabin@adams.com',
       name: 'Sabin Adams',
@@ -32,26 +35,36 @@ async function main() {
       role: 'PATIENT',
       profile: { create: {} },
       symptoms: {
-      create: [
-        {
-          type: 'Anxiety',
-          severity: 6,
-          description: 'Increased heart rate.',
-        },
-        {
-          type: 'Insomnia',
-          severity: 4,
-          description: 'Difficulty staying asleep.',
-        }
-      ],
+        create: [
+          {
+            description: 'Feeling generally uneasy and restless today.',
+            values: {
+              create: [
+                { type: 'Anxiety', severity: 6 },
+                { type: 'Insomnia', severity: 4 },
+                { type: 'Pain', severity: 2 },
+              ],
+            },
+          },
+          {
+            description: 'Follow-up log for the evening.',
+            values: {
+              create: [
+                { type: 'Anxiety', severity: 3 },
+                { type: 'Fatigue', severity: 8 },
+              ],
+            },
+          },
+        ],
       },
     },
   });
 
   const user2 = await prisma.user.upsert({
     where: { email: 'alex@ruheni.com' },
-    update: {      
-      password: passwordAlex, role: 'ADMIN' },
+    update: {
+      password: passwordAlex, role: 'ADMIN'
+    },
     create: {
       email: 'alex@ruheni.com',
       name: 'Alex Ruheni',
@@ -61,7 +74,7 @@ async function main() {
     },
   });
 
-const user3 = await prisma.user.upsert({
+  const user3 = await prisma.user.upsert({
     where: { email: 'dr.smith@hospital.com' },
     update: { password: passwordDrSmith },
     create: {
@@ -82,26 +95,12 @@ const user3 = await prisma.user.upsert({
       password: passwordJane,
       role: 'PATIENT',
       profile: { create: {} },
-      symptoms: {
-      create: [
-        {
-          type: 'Anxiety',
-          severity: 5,
-          description: 'Increased heart rate.',
-        },
-        {
-          type: 'Anxiety',
-          severity: 4,
-          description: 'Difficulty staying focused.',
-        }
-      ],
-      },
     },
   });
 
- 
 
-    console.log({ user1, user2, user3, user4});
+
+  console.log({ user1, user2, user3, user4 });
 }
 
 

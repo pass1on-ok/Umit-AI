@@ -45,17 +45,22 @@ model HadsResponse{
 }
 
 model Symptom {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          Int            @id @default(autoincrement())
+  createdAt   DateTime       @default(now())
+  description String?        @db.Text
+  
+  userId      Int
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  values      SymptomValue[] 
+}
 
-  type        String   
-  severity    Int   
-  description String?  @db.Text 
+model SymptomValue {
+  id       Int    @id @default(autoincrement())
+  type     String 
+  severity Int
 
-
-  userId   Int?
-  user     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entryId  Int
+  entry    Symptom @relation(fields: [entryId], references: [id], onDelete: Cascade)
 }
 
 enum Role {

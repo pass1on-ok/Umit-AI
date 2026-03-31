@@ -1,29 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-    Min,
-    Max,
-    IsInt,
-    IsOptional,
-    IsNotEmpty,
-    IsString,
-} from 'class-validator';
+import { IsString, IsInt, Min, Max, IsArray, ValidateNested, IsOptional, IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CreateSymptomDto {
+export class SymptomValueDto {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({ example: 'pain', description: 'The name of the symptom' })
   type: string;
 
   @IsInt()
-  @Min(1)
+  @Min(0)
   @Max(10)
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({ example: 5, description: 'Severity score from 0 to 10' })
   severity: number;
+}
 
+export class CreateSymptomDto {
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false,  })
   description?: string;
+
+  @IsArray()
+  @IsNotEmpty() 
+  @ValidateNested({ each: true })
+  @Type(() => SymptomValueDto)
+  @ApiProperty({ type: [SymptomValueDto],  })
+  values: SymptomValueDto[];
 }

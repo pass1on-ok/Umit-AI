@@ -14,20 +14,17 @@ const Auth = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   console.log("Auth format submitted, navigating to dashboard");
-  //   navigate('/dashboard');
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   
   const endpoint = isLogin ? '/auth/login' : '/users/register';
+  // Use VITE_API_URL if you have it in your .env, otherwise localhost is fine for now
   const url = `http://localhost:3000${endpoint}`;
 
-  const payload = isLogin ? { email: formData.email, password: formData.password } : formData;
-
+  const payload = isLogin 
+    ? { email: formData.email, password: formData.password } 
+    : formData;
 
   try {
     const response = await fetch(url, {
@@ -39,22 +36,30 @@ const Auth = () => {
     const data = await response.json();
 
     if (response.ok) {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('userName', data.user.name); 
-      localStorage.setItem('userRole', data.user.role); 
-      localStorage.setItem('userId', data.user.id); 
-      console.log("Storage updated with role:", localStorage.getItem('userRole'));
-      navigate('/dashboard');
+      if (data.accessToken) {
+        localStorage.setItem('accessToken', data.accessToken);
+      }
+      const user = data.user || data;
+
+      if (user && typeof user === 'object') {
+        localStorage.setItem('userName', user.name || 'User'); 
+        localStorage.setItem('userRole', user.role || 'PATIENT'); 
+        localStorage.setItem('userId', String(user.id || '')); 
+        
+        console.log("Auth Success. Role:", user.role);
+        navigate('/dashboard');
+      } else {
+        throw new Error("User data format is incorrect");
+      }
+
     } else {
       alert(data.message || "Authentication failed");
     }
   } catch (error) {
     console.error("Connection error:", error);
-    alert("Could not connect to the backend. Is Docker running?");
+    alert("Could not connect to the backend. Please check if the server is running.");
   }
-  
 };
-
 
 
   return (

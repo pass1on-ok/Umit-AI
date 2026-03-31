@@ -1,10 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { HeartPulse, Activity, Shield, ArrowRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const Home = () => {
+  const navigate = useNavigate(); 
+
+  const handleGetStarted = () => {
+    const token = localStorage.getItem('accessToken');
+
+    if (token) {
+      navigate('/dashboard');
+    } else {
+      navigate('/auth');
+    }
+  };
+
   console.log("Rendering Home Page");
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] text-center max-w-4xl mx-auto py-12">
@@ -12,18 +24,21 @@ const Home = () => {
         <HeartPulse className="w-24 h-24 text-primary" />
       </div>
       <h1 className="text-5xl font-bold tracking-tight mb-6 text-foreground">
-        Compassionate Care, <br/><span className="text-primary mt-2 block">Powered by Data</span>
+        Compassionate Care, <br /><span className="text-primary mt-2 block">Powered by Data</span>
       </h1>
       <p className="text-xl text-muted-foreground mb-10 max-w-2xl">
         OncoSupport bridges the gap between clinic visits with daily symptom tracking, verified psychological assessments, and direct communication with your healthcare team.
       </p>
-      
+
       <div className="flex gap-4 mb-16">
-        <Link to="/auth">
-          <Button size="lg" className="gap-2 px-8 text-lg h-14">
-            Get Started <ArrowRight className="w-5 h-5" />
-          </Button>
-        </Link>
+        <Button
+          size="lg"
+          className="gap-2 px-8 text-lg h-14"
+          onClick={handleGetStarted}
+        >
+          Get Started <ArrowRight className="w-5 h-5" />
+        </Button>
+
         <Link to="/dashboard">
           <Button size="lg" variant="outline" className="gap-2 px-8 text-lg h-14">
             View Live Demo

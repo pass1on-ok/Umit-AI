@@ -17,11 +17,22 @@ const roundsOfHashing = 10;
 
 
 async function main() {
+  const patientSabinEmail = process.env.PATIENT_SABIN_EMAIL || 'sabin@adams.com';
+  const patientSabinPass = process.env.PATIENT_SABIN_PASSWORD || 'password-sabin';
 
-  const passwordSabin = await bcrypt.hash('password-sabin', roundsOfHashing);
-  const passwordAlex = await bcrypt.hash('password-alex', roundsOfHashing);
-  const passwordDrSmith = await bcrypt.hash('password-smith', roundsOfHashing);
-  const passwordJane = await bcrypt.hash('password-jane', roundsOfHashing);
+  const adminEmail = process.env.ADMIN_EMAIL || 'alex@ruheni.com';
+  const adminPass = process.env.ADMIN_PASSWORD || 'password-alex';
+
+  const doctorEmail = process.env.DOCTOR_EMAIL || 'dr.smith@hospital.com';
+  const doctorPass = process.env.DOCTOR_PASSWORD || 'password-smith';
+
+  const patientJaneEmail = process.env.PATIENT_JANE_EMAIL || 'jane.doe@example.com';
+  const patientJanePass = process.env.PATIENT_JANE_PASSWORD || 'password-jane';
+
+  const passwordSabin = await bcrypt.hash(patientSabinPass, roundsOfHashing);
+  const passwordAlex = await bcrypt.hash(adminPass, roundsOfHashing);
+  const passwordDrSmith = await bcrypt.hash(doctorPass, roundsOfHashing);
+  const passwordJane = await bcrypt.hash(patientJanePass, roundsOfHashing);
 
   const user1 = await prisma.user.upsert({
     where: { email: 'sabin@adams.com' },
@@ -29,7 +40,7 @@ async function main() {
       password: passwordSabin, role: 'PATIENT'
     },
     create: {
-      email: 'sabin@adams.com',
+      email: patientSabinEmail,
       name: 'Sabin Adams',
       password: passwordSabin,
       role: 'PATIENT',
@@ -61,7 +72,7 @@ async function main() {
   });
 
   const user2 = await prisma.user.upsert({
-    where: { email: 'alex@ruheni.com' },
+    where: { email: adminEmail },
     update: {
       password: passwordAlex, role: 'ADMIN'
     },
@@ -75,7 +86,7 @@ async function main() {
   });
 
   const user3 = await prisma.user.upsert({
-    where: { email: 'dr.smith@hospital.com' },
+    where: { email: doctorEmail },
     update: { password: passwordDrSmith },
     create: {
       email: 'dr.smith@hospital.com',
@@ -87,7 +98,7 @@ async function main() {
   });
 
   const user4 = await prisma.user.upsert({
-    where: { email: 'jane.doe@example.com' },
+    where: { email: patientJaneEmail },
     update: { password: passwordJane },
     create: {
       email: 'jane.doe@example.com',

@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+  PSYCHOLOGIST
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String   @unique
+  password  String
+  role      Role     @default(PATIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile       Profile?
+  hadsResponses HadsResponse[]
+  symptoms      Symptom[]
+}
+
+model Profile {
+  id             Int       @id @default(autoincrement())
+  gender         String?
+  dateOfBirth    DateTime?
+  address        String?
+  phone          String?
+  diagnosis      String?
+  stage          String?
+  treatmentPhase String?
+  userId         Int       @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HadsResponse {
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime @default(now())
+  answers         Int[]
+  anxietyScore    Int
+  depressionScore Int
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Symptom {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  pain      Int      @default(0)
+  fatigue   Int      @default(0)
+  appetite  Int      @default(0)
+  nausea    Int      @default(0)
+  sleep     Int      @default(0)
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
